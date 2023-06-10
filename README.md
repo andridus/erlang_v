@@ -1,2 +1,2 @@
 # erlang_v
-About Erlang External Term Format for V
+Provide a Erlang External Term Format for V
