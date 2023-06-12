@@ -1,5 +1,7 @@
 module main
 
+import erlang
+
 fn main() {
-	println('Hello World!')
+	erlang.main()
 }
