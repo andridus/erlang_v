@@ -23,16 +23,19 @@ pub fn binary_to_term(data []byte) !Term {
 fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 	tag := reader.read_byte() or { return err }
 	mut i0 := i + 1
+
 	match tag {
 		tag_atom_ext, tag_atom_utf8_ext {
 			val := binary.read_u16(mut reader, binary.big_endian)!
 			j := int(val)
 			i0 += 2
+
 			mut value := []u8{cap: j}
 
 			if j > 0 {
 				value = reader.read_bytes(j)!
 			}
+
 			pos := i0 + int(j)
 			str := value.bytestr()
 			match str {
@@ -107,8 +110,9 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 }
 
 pub fn main() {
-	bi := '\x83\x64\x00\x04test'.bytes()
-	a := binary_to_term(bi) or {
+	mut arr := 'meuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocdas'.bytes()
+	arr.prepend([u8(131), 100, 0, 255])
+	a := binary_to_term(arr) or {
 		println(err.msg())
 		return
 	}
