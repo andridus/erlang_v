@@ -16,6 +16,7 @@ pub fn binary_to_term(data []byte) !Term {
 		return error('invalid version')
 	}
 	i, term := do_binary_to_term(1, mut reader) or { return err }
+	// println('i: $i, term: $term, size: $size')
 	if i != size {
 		return error('unparsed data')
 	}
@@ -151,6 +152,19 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 			val := binary.read_f64(mut reader, binary.big_endian)!
 			return i0 + 8, ErlFloat(val)
 		}
+		tag_string_ext {
+			val := binary.read_u16(mut reader, binary.big_endian)!
+			j := int(val)
+			i0 += 2
+			mut value := []u8{len: j}
+
+			if j > 0 {
+				value = reader.read_bytes(j)!
+			}
+			pos := i0 + int(j)
+			str := value.bytestr()
+			return pos, ErlString(str)
+		}
 		else {
 			return error('Invalid TAG')
 		}
@@ -182,6 +196,7 @@ fn term_to_binary(term Term) ![]u8 {
 		ErlInteger8 { integer8_to_binary(term) }
 		ErlFloat { float_to_binary(term) }
 		ErlAtom { atom_to_binary(term)! }
+		ErlString { string_to_binary(term)! }
 		else { error('not a valid term') }
 	}
 }
@@ -214,6 +229,32 @@ pub fn atom_utf8_to_binary(term ErlAtom) ![]u8 {
 	}
 }
 
+pub fn string_to_binary(term string) ![]u8 {
+	length := term.len
+	if length == 0 {
+		return [u8(tag_version), tag_nil_ext]
+	} else if length < 1 << 16 - 1 {
+		mut buf := term.bytes()
+		buf.prepend(binary.big_endian.put_u16(u16(length)))
+		buf.prepend(tag_string_ext)
+		buf.prepend(tag_version)
+		return buf
+	} else if u64(length) < 1 << 32 - 1 {
+		mut buf := []u8{}
+		for i0 := 0; i0 < length ; i0++ {
+			buf << tag_small_integer_ext
+			buf << u8(term[i0])
+		}
+		buf << tag_nil_ext
+		buf.prepend(binary.big_endian.put_u32(u32(length)))
+		buf.prepend(tag_list_ext)
+		buf.prepend(tag_version)
+		return buf
+	}
+	else {
+		return error('u32 overflow')
+	}
+}
 pub fn float_to_binary(value f64) []u8 {
 	mut buf := binary.big_endian.put_u64(u64(math.f64_bits(f64(value))))
 	buf.prepend(tag_new_float_ext)
@@ -264,16 +305,16 @@ pub fn integer_big_to_binary(term big.Integer) ![]u8 {
 }
 
 pub fn main() {
-	// atom := erlang.ErlFloat(1.6)
+	atom := erlang.ErlString("Minha String")
 
-	// bin := erlang.term_to_binary(atom) or {
-	// 	println(err.msg())
-	// 	exit(0)
-	// }
-	// println(bin)
-	// a := erlang.binary_to_term(bin) or {
-	// 	println(err.msg())
-	// 	exit(0)
-	// }
-	// println(a)
+	bin := erlang.term_to_binary(atom) or {
+		println(err.msg())
+		exit(0)
+	}
+	println(bin)
+	a := erlang.binary_to_term(bin) or {
+		println(err.msg())
+		exit(0)
+	}
+	println(a)
 }

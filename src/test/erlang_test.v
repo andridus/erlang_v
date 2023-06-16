@@ -56,3 +56,10 @@ fn test_decode_binary_to_term_float() {
 	bin := erlang.term_to_binary(float)!
 	assert erlang.Term(erlang.ErlFloat(1.6)) == erlang.binary_to_term(bin)!
 }
+fn test_decode_binary_to_term_string() {
+	atom := erlang.ErlString("Minha String")
+	bin := erlang.term_to_binary(atom)!
+	a := erlang.Term(atom)
+	b := erlang.binary_to_term(bin)!
+	assert  a == b
+}

@@ -22,7 +22,7 @@ const (
 	tag_small_tuple_ext     = 104
 	tag_large_tuple_ext     = 105
 	tag_nil_ext             = 106
-	tag_string_ext          = 107
+	tag_string_ext          = 107 // OK
 	tag_list_ext            = 108
 	tag_binary_ext          = 109
 	tag_small_big_ext       = 110 //OK
@@ -44,10 +44,11 @@ type Term = ErlAtom
 	| ErlAtomUTF8
 	| ErlBinary
 	| ErlBoolean
+	| ErlString
 	| ErlFloat
 	| ErlFunction
-	| ErlInteger32
 	| ErlInteger8
+	| ErlInteger32
 	| ErlIntegerBig
 	| ErlList
 	| ErlMap
@@ -77,6 +78,9 @@ type ErlAtomCacheRef = u8
 
 // SMALL_ATOM_UTF8 or ATOM_UTF8_EXT
 type ErlAtomUTF8 = string
+
+// BIT_STRING_EXT
+type ErlString = string
 
 // BIT_BIANRY_EXT or BINARY_EXT
 struct ErlBinary {
