@@ -1,6 +1,8 @@
 module erlang
 
+import math.big
 // tag values here http://www.erlang.org/doc/apps/erts/erl_ext_dist.html
+
 const (
 	tag_version             = 131
 	tag_compressed_zlib     = 80
@@ -44,7 +46,9 @@ type Term = ErlAtom
 	| ErlBoolean
 	| ErlFloat32
 	| ErlFunction
-	| ErlInteger
+	| ErlInteger32
+	| ErlInteger8
+	| ErlIntegerBig
 	| ErlList
 	| ErlMap
 	| ErlNil
@@ -61,7 +65,9 @@ type MaybeTerm = Error | Term
 type ErlNil = u8
 type ErlBoolean = bool
 type ErlFloat32 = f32
-type ErlInteger = int
+type ErlInteger8 = i8
+type ErlInteger32 = int
+type ErlIntegerBig = big.Integer
 
 // SMALL_ATOM_EXT or ATOM_EXT
 type ErlAtom = string
