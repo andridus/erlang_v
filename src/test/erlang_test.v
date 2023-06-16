@@ -16,13 +16,16 @@ fn test_atom() {
 	assert atom1.str() == atom2
 }
 
-// fn test_decode_binary_to_term_atom() {
-// 	assert erlang.Term(erlang.ErlAtom('test')) == decode('\x83\x64\x00\x04test')!
-// }
-
-// fn test_decode_binary_to_term_big_atom() {
-// 	assert erlang.Term(erlang.ErlAtomUTF8('meuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocdas')) == decode('\x83\x64\x00\xffmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocabeem255caracteresmeuatomogigantissimoquenaocdas')!
-// }
+fn test_decode_binary_to_term_atom() {
+	atom := erlang.ErlAtom("my_atom")
+	bin := erlang.term_to_binary(atom)!
+	assert erlang.Term(erlang.ErlAtom("my_atom")) == erlang.binary_to_term(bin)!
+}
+fn test_decode_binary_to_term_big_atom() {
+	atom := erlang.string_to_atom("loremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusantevenenatisloremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusante")
+	bin := erlang.term_to_binary(atom)!
+	assert erlang.Term(erlang.ErlAtom("loremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusantevenenatisloremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusante")) == erlang.binary_to_term(bin)!
+}
 
 fn test_decode_binary_to_term_integer() {
 	integer := erlang.int_to_term(123)

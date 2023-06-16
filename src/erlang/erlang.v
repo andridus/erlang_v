@@ -180,10 +180,38 @@ fn term_to_binary(term Term) ![]u8 {
 		ErlIntegerBig { integer_big_to_binary(term)! }
 		ErlInteger32 { integer32_to_binary(term) }
 		ErlInteger8 { integer8_to_binary(term) }
+		ErlAtom { atom_to_binary(term)! }
 		else { error('not an integer') }
 	}
 }
 
+pub fn atom_to_binary(term ErlAtom) ![]u8 {
+	length := term.len
+	mut buf := term.bytes()
+	if length < 1 << 8 {
+		buf.prepend(binary.big_endian.put_u16(u16(length)))
+		buf.prepend(tag_atom_ext)
+		buf.prepend(tag_version)
+		return  buf
+	} else {
+		return error("atom length must be less than system: $term")
+	}
+}
+pub fn atom_utf8_to_binary(term ErlAtom) ![]u8 {
+	length := term.len
+	mut buf := term.bytes()
+	if 0 <= length && length <= 255 {
+		buf.prepend(tag_small_atom_utf8_ext)
+		buf.prepend(tag_version)
+		return  buf
+	} else if	length < 1 << 16 - 1 {
+		buf.prepend(tag_atom_utf8_ext)
+		buf.prepend(tag_version)
+		return  buf
+	} else {
+		return error("u16 overflow")
+	}
+}
 pub fn integer8_to_binary(term ErlInteger8) []u8 {
 	return [u8(tag_version), tag_small_integer_ext, term]
 }
@@ -228,14 +256,16 @@ pub fn integer_big_to_binary(term ErlIntegerBig) ![]u8 {
 }
 
 pub fn main() {
-	integer := i64_to_term(i64(999999999999999999))
-	bin := term_to_binary(integer) or {
+	atom := erlang.ErlAtom("loremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusantevenenatisloremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusante")
+
+	bin := erlang.term_to_binary(atom) or {
 		println(err.msg())
-		return
+		exit(0)
 	}
-	a := binary_to_term(bin) or {
+	println(bin)
+	a := erlang.binary_to_term(bin) or {
 		println(err.msg())
-		return
+		exit(0)
 	}
 	println(a)
 }
