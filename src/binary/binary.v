@@ -12,6 +12,7 @@ interface ByteOrder {
 	u16([]u8) u16
 	u32([]u8) u32
 	u64([]u8) u64
+	put_u64(u64) []u8
 	put_u32(u32) []u8
 	put_u8(u8) []u8
 }
@@ -27,7 +28,7 @@ pub fn (_le LittleEndian) u32(b []u8) u32 {
 }
 
 pub fn (_le LittleEndian) u64(b []u8) u64 {
-	return u64(b[0]) | u64(b[1]) << 8 | u64(b[2]) << 16 | u64(b[3]) << 24 | u64(b[4]) << 31 | u64(b[5]) << 40 | u64(b[6]) << 48 | u64(b[7]) << 56
+	return u64(b[0]) | u64(b[1]) << 8 | u64(b[2]) << 16 | u64(b[3]) << 24 | u64(b[4]) << 32 | u64(b[5]) << 40 | u64(b[6]) << 48 | u64(b[7]) << 56
 }
 
 pub fn (_be LittleEndian) put_u32(v u32) []u8 {
@@ -36,6 +37,18 @@ pub fn (_be LittleEndian) put_u32(v u32) []u8 {
 	b << u8(v >> 8)
 	b << u8(v >> 16)
 	b << u8(v >> 24)
+	return b
+}
+pub fn (_be LittleEndian) put_u64(v u64) []u8 {
+	mut b := []u8{}
+	b << u8(v)
+	b << u8(v >> 8)
+	b << u8(v >> 16)
+	b << u8(v >> 24)
+	b << u8(v >> 32)
+	b << u8(v >> 40)
+	b << u8(v >> 48)
+	b << u8(v >> 56)
 	return b
 }
 
@@ -62,7 +75,20 @@ pub fn (_be BigEndian) u32(b []u8) u32 {
 }
 
 pub  fn (_be BigEndian) u64(b []u8) u64 {
-	return u64(b[7]) | u64(b[6]) << 8 | u64(b[5]) << 16 | u64(b[4]) << 24 | u64(b[3]) << 31 | u64(b[2]) << 40 | u64(b[1]) << 48 | u64(b[0]) << 56
+	return u64(b[7]) | u64(b[6]) << 8 | u64(b[5]) << 16 | u64(b[4]) << 24 | u64(b[3]) << 32 | u64(b[2]) << 40 | u64(b[1]) << 48 | u64(b[0]) << 56
+}
+
+pub fn (_be BigEndian) put_u64(v u64) []u8 {
+	mut b := []u8{}
+	b << u8(v >> 56)
+	b << u8(v >> 48)
+	b << u8(v >> 40)
+	b << u8(v >> 32)
+	b << u8(v >> 24)
+	b << u8(v >> 16)
+	b << u8(v >> 8)
+	b << u8(v)
+	return b
 }
 
 pub fn (_be BigEndian) put_u32(v u32) []u8 {
@@ -118,6 +144,12 @@ pub fn read_f32(mut r bytes.Reader, order ByteOrder) !f32 {
 	data_size := 4
 	bs := read_from(mut r, data_size)!
 	return math.f32_from_bits(order.u32(bs))
+}
+
+pub fn read_f64(mut r bytes.Reader, order ByteOrder) !f64 {
+	data_size := 8
+	bs := read_from(mut r, data_size)!
+	return math.f64_from_bits(order.u64(bs))
 }
 
 // pub fn read_i8(r bytes.Reader, order ByteOrder) i8 {

@@ -53,10 +53,10 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 				else {
 					match tag {
 						tag_atom_ext {
-							return pos, ErlAtomUTF8(str)
+							return pos, ErlAtom(str)
 						}
 						tag_atom_utf8_ext {
-							return pos, ErlAtom(str)
+							return pos, ErlAtomUTF8(str)
 						}
 						else {
 							return error('Invalid tag clause')
@@ -147,10 +147,10 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 			}
 			return i0 + j0, ErlIntegerBig(bignum)
 		}
-		// tag_new_float_ext {
-		// 	val := binary.read_f32(mut reader, binary.little_endian)!
-		// 	return i + 8, ErlFloat32(val)
-		// }
+		tag_new_float_ext {
+			val := binary.read_f64(mut reader, binary.big_endian)!
+			return i0 + 8, ErlFloat(val)
+		}
 		else {
 			return error('Invalid TAG')
 		}
@@ -180,8 +180,9 @@ fn term_to_binary(term Term) ![]u8 {
 		ErlIntegerBig { integer_big_to_binary(term)! }
 		ErlInteger32 { integer32_to_binary(term) }
 		ErlInteger8 { integer8_to_binary(term) }
+		ErlFloat { float_to_binary(term) }
 		ErlAtom { atom_to_binary(term)! }
-		else { error('not an integer') }
+		else { error('not a valid term') }
 	}
 }
 
@@ -212,18 +213,25 @@ pub fn atom_utf8_to_binary(term ErlAtom) ![]u8 {
 		return error("u16 overflow")
 	}
 }
-pub fn integer8_to_binary(term ErlInteger8) []u8 {
-	return [u8(tag_version), tag_small_integer_ext, term]
+
+pub fn float_to_binary(value f64) []u8 {
+	mut buf := binary.big_endian.put_u64(u64(math.f64_bits(f64(value))))
+	buf.prepend(tag_new_float_ext)
+	buf.prepend(tag_version)
+	return buf
+}
+pub fn integer8_to_binary(term i8) []u8 {
+	return [u8(tag_version), tag_small_integer_ext, u8(term)]
 }
 
-pub fn integer32_to_binary(term ErlInteger32) []u8 {
+pub fn integer32_to_binary(term int) []u8 {
 	mut buf := binary.write_int(term, binary.big_endian)
 	buf.prepend(tag_integer_ext)
 	buf.prepend(tag_version)
 	return buf
 }
 
-pub fn integer_big_to_binary(term ErlIntegerBig) ![]u8 {
+pub fn integer_big_to_binary(term big.Integer) ![]u8 {
 	mut sign := u8(0)
 	if term.signum < 0 {
 		sign = 1
@@ -256,16 +264,16 @@ pub fn integer_big_to_binary(term ErlIntegerBig) ![]u8 {
 }
 
 pub fn main() {
-	atom := erlang.ErlAtom("loremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusantevenenatisloremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusante")
+	// atom := erlang.ErlFloat(1.6)
 
-	bin := erlang.term_to_binary(atom) or {
-		println(err.msg())
-		exit(0)
-	}
-	println(bin)
-	a := erlang.binary_to_term(bin) or {
-		println(err.msg())
-		exit(0)
-	}
-	println(a)
+	// bin := erlang.term_to_binary(atom) or {
+	// 	println(err.msg())
+	// 	exit(0)
+	// }
+	// println(bin)
+	// a := erlang.binary_to_term(bin) or {
+	// 	println(err.msg())
+	// 	exit(0)
+	// }
+	// println(a)
 }

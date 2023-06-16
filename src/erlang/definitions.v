@@ -4,18 +4,18 @@ import math.big
 // tag values here http://www.erlang.org/doc/apps/erts/erl_ext_dist.html
 
 const (
-	tag_version             = 131
+	tag_version             = 131 //OK
 	tag_compressed_zlib     = 80
-	tag_new_float_ext       = 70
+	tag_new_float_ext       = 70 //OK
 	tag_bit_binary_ext      = 77
 	tag_atom_cache_ref      = 78
 	tag_new_pid_ext         = 88
 	tag_new_port_ext        = 89
 	tag_newer_reference_ext = 90
-	tag_small_integer_ext   = 97
-	tag_integer_ext         = 98
+	tag_small_integer_ext   = 97  //OK
+	tag_integer_ext         = 98	//OK
 	tag_float_ext           = 99
-	tag_atom_ext            = 100
+	tag_atom_ext            = 100	//OK
 	tag_reference_ext       = 101
 	tag_port_ext            = 102
 	tag_pid_ext             = 103
@@ -25,16 +25,16 @@ const (
 	tag_string_ext          = 107
 	tag_list_ext            = 108
 	tag_binary_ext          = 109
-	tag_small_big_ext       = 110
-	tag_large_big_ext       = 111
+	tag_small_big_ext       = 110 //OK
+	tag_large_big_ext       = 111 //OK
 	tag_new_fun_ext         = 112
 	tag_export_ext          = 113
 	tag_new_reference_ext   = 114
-	tag_small_atom_ext      = 115
+	tag_small_atom_ext      = 115 //OK
 	tag_map_ext             = 116
 	tag_fun_ext             = 117
-	tag_atom_utf8_ext       = 118
-	tag_small_atom_utf8_ext = 119
+	tag_atom_utf8_ext       = 118	//OK
+	tag_small_atom_utf8_ext = 119 //OK
 	tag_v4_port_ext         = 120
 	tag_local_ext           = 121
 )
@@ -44,7 +44,7 @@ type Term = ErlAtom
 	| ErlAtomUTF8
 	| ErlBinary
 	| ErlBoolean
-	| ErlFloat32
+	| ErlFloat
 	| ErlFunction
 	| ErlInteger32
 	| ErlInteger8
@@ -64,7 +64,7 @@ type MaybeTerm = Error | Term
 // native
 type ErlNil = u8
 type ErlBoolean = bool
-type ErlFloat32 = f32
+type ErlFloat = f64
 type ErlInteger8 = i8
 type ErlInteger32 = int
 type ErlIntegerBig = big.Integer
