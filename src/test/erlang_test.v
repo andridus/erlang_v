@@ -70,3 +70,11 @@ fn test_decode_binary_to_term_string() {
 	b := erlang.binary_to_term(bin)!
 	assert a == b
 }
+
+fn test_decode_bianry_to_term_binary_object() {
+	buf := [u8(1), 2, 3]
+	b := erlang.new_binary_object(buf)
+	bin := erlang.term_to_binary(b)!
+	a := erlang.binary_to_term(bin)!
+	assert a == b
+}

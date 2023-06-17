@@ -7,7 +7,7 @@ const (
 	tag_version             = 131 // OK
 	tag_compressed_zlib     = 80
 	tag_new_float_ext       = 70 // OK
-	tag_bit_binary_ext      = 77
+	tag_bit_binary_ext      = 77 // OK
 	tag_atom_cache_ref      = 78
 	tag_new_pid_ext         = 88
 	tag_new_port_ext        = 89
@@ -24,7 +24,7 @@ const (
 	tag_nil_ext             = 106 // OK
 	tag_string_ext          = 107 // OK
 	tag_list_ext            = 108
-	tag_binary_ext          = 109
+	tag_binary_ext          = 109 // OK
 	tag_small_big_ext       = 110 // OK
 	tag_large_big_ext       = 111 // OK
 	tag_new_fun_ext         = 112
