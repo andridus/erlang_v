@@ -21,8 +21,8 @@ const (
 	tag_pid_ext             = 103
 	tag_small_tuple_ext     = 104
 	tag_large_tuple_ext     = 105
-	tag_nil_ext             = 106
-	tag_string_ext          = 107 // OK
+	tag_nil_ext             = 106 //OK
+	tag_string_ext          = 107 //OK
 	tag_list_ext            = 108
 	tag_binary_ext          = 109
 	tag_small_big_ext       = 110 //OK
@@ -63,7 +63,7 @@ type Errors = InputError | OutputError | ParseError
 type MaybeTerm = Error | Term
 
 // native
-type ErlNil = u8
+struct ErlNil {}
 type ErlBoolean = bool
 type ErlFloat = f64
 type ErlInteger8 = i8

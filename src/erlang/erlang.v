@@ -28,6 +28,7 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 	mut i0 := i + 1
 
 	match tag {
+		tag_nil_ext { return i0, ErlNil{} }
 		tag_atom_ext, tag_atom_utf8_ext {
 			val := binary.read_u16(mut reader, binary.big_endian)!
 			j := int(val)
@@ -49,7 +50,7 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 					return pos, ErlBoolean(false)
 				}
 				'undefined' {
-					return pos, ErlNil(0)
+					return pos, ErlNil{}
 				}
 				else {
 					match tag {
@@ -85,7 +86,7 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 					return pos, ErlBoolean(false)
 				}
 				'undefined' {
-					return pos, ErlNil(0)
+					return pos, ErlNil{}
 				}
 				else {
 					match tag {
@@ -304,6 +305,9 @@ pub fn integer_big_to_binary(term big.Integer) ![]u8 {
 	return buf
 }
 
+pub fn nil_to_binary() []u8 {
+	return [u8(tag_version), tag_nil_ext]
+}
 pub fn main() {
 	atom := erlang.ErlString("Minha String")
 
