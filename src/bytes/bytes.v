@@ -82,7 +82,7 @@ pub fn (mut r Reader) read_byte() !u8 {
 }
 
 pub fn (mut r Reader) read_bytes(len int) ![]u8 {
-	mut bin := []u8{len: len}
+	mut bin := []u8{}
 	for _ in 0 .. len {
 		bin << r.read_byte()!
 	}

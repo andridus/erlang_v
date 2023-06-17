@@ -17,18 +17,19 @@ fn test_atom() {
 }
 
 fn test_decode_binary_to_term_atom() {
-	atom := erlang.ErlAtom("my_atom")
+	atom := erlang.ErlAtom('my_atom')
 	bin := erlang.term_to_binary(atom)!
 	a := erlang.Term(atom)
 	b := erlang.binary_to_term(bin)!
-	assert  a == b
+	assert a == b
 }
+
 fn test_decode_binary_to_term_big_atom() {
-	atom := erlang.ErlAtom("loremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusantevenenatisloremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusante")
+	atom := erlang.ErlAtom('loremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusantevenenatisloremipsumdolorsitamet,consecteturadipiscingelit.Namsedrutrumaugue.Namatmollisquam.Sedrhoncusquamacnuncmollis,etdapibusante')
 	bin := erlang.atom_to_binary(atom)!
 	a := erlang.Term(atom)
 	b := erlang.binary_to_term(bin)!
-	assert  a == b
+	assert a == b
 }
 
 fn test_decode_binary_to_term_integer() {
@@ -56,10 +57,16 @@ fn test_decode_binary_to_term_float() {
 	bin := erlang.term_to_binary(float)!
 	assert erlang.Term(erlang.ErlFloat(1.6)) == erlang.binary_to_term(bin)!
 }
+
+fn test_decode_binary_to_old_term_float() {
+	bin := erlang.old_float_to_binary(f64(1.6))
+	assert erlang.Term(erlang.ErlFloat(1.6)) == erlang.binary_to_term(bin)!
+}
+
 fn test_decode_binary_to_term_string() {
-	atom := erlang.ErlString("Minha String")
+	atom := erlang.ErlString('Minha String')
 	bin := erlang.term_to_binary(atom)!
 	a := erlang.Term(atom)
 	b := erlang.binary_to_term(bin)!
-	assert  a == b
+	assert a == b
 }

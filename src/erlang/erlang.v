@@ -4,6 +4,7 @@ import bytes
 import binary
 import math
 import math.big
+import strconv
 
 pub fn binary_to_term(data []byte) !Term {
 	size := data.len
@@ -28,7 +29,9 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 	mut i0 := i + 1
 
 	match tag {
-		tag_nil_ext { return i0, ErlNil{} }
+		tag_nil_ext {
+			return i0, ErlNil{}
+		}
 		tag_atom_ext, tag_atom_utf8_ext {
 			val := binary.read_u16(mut reader, binary.big_endian)!
 			j := int(val)
@@ -153,6 +156,11 @@ fn do_binary_to_term(i int, mut reader bytes.Reader) !(int, Term) {
 			val := binary.read_f64(mut reader, binary.big_endian)!
 			return i0 + 8, ErlFloat(val)
 		}
+		tag_float_ext {
+			value := reader.read_bytes(31)!
+			fvalue := strconv.atof64(value.bytestr())!
+			return i0 + 31, ErlFloat(fvalue)
+		}
 		tag_string_ext {
 			val := binary.read_u16(mut reader, binary.big_endian)!
 			j := int(val)
@@ -209,24 +217,25 @@ pub fn atom_to_binary(term ErlAtom) ![]u8 {
 		buf.prepend(binary.big_endian.put_u16(u16(length)))
 		buf.prepend(tag_atom_ext)
 		buf.prepend(tag_version)
-		return  buf
+		return buf
 	} else {
-		return error("atom length must be less than system: $term")
+		return error('atom length must be less than system: ${term}')
 	}
 }
+
 pub fn atom_utf8_to_binary(term ErlAtom) ![]u8 {
 	length := term.len
 	mut buf := term.bytes()
 	if 0 <= length && length <= 255 {
 		buf.prepend(tag_small_atom_utf8_ext)
 		buf.prepend(tag_version)
-		return  buf
-	} else if	length < 1 << 16 - 1 {
+		return buf
+	} else if length < 1 << 16 - 1 {
 		buf.prepend(tag_atom_utf8_ext)
 		buf.prepend(tag_version)
-		return  buf
+		return buf
 	} else {
-		return error("u16 overflow")
+		return error('u16 overflow')
 	}
 }
 
@@ -242,7 +251,7 @@ pub fn string_to_binary(term string) ![]u8 {
 		return buf
 	} else if u64(length) < 1 << 32 - 1 {
 		mut buf := []u8{}
-		for i0 := 0; i0 < length ; i0++ {
+		for i0 := 0; i0 < length; i0++ {
 			buf << tag_small_integer_ext
 			buf << u8(term[i0])
 		}
@@ -251,17 +260,27 @@ pub fn string_to_binary(term string) ![]u8 {
 		buf.prepend(tag_list_ext)
 		buf.prepend(tag_version)
 		return buf
-	}
-	else {
+	} else {
 		return error('u32 overflow')
 	}
 }
+
 pub fn float_to_binary(value f64) []u8 {
 	mut buf := binary.big_endian.put_u64(u64(math.f64_bits(f64(value))))
 	buf.prepend(tag_new_float_ext)
 	buf.prepend(tag_version)
 	return buf
 }
+
+pub fn old_float_to_binary(value f64) []u8 {
+	fstr := strconv.f64_to_str_l(value).bytes()
+	mut buf := []u8{len: 31 - fstr.len}
+	buf.prepend(fstr)
+	buf.prepend(tag_float_ext)
+	buf.prepend(tag_version)
+	return buf
+}
+
 pub fn integer8_to_binary(term i8) []u8 {
 	return [u8(tag_version), tag_small_integer_ext, u8(term)]
 }
@@ -308,17 +327,18 @@ pub fn integer_big_to_binary(term big.Integer) ![]u8 {
 pub fn nil_to_binary() []u8 {
 	return [u8(tag_version), tag_nil_ext]
 }
-pub fn main() {
-	atom := erlang.ErlString("Minha String")
 
-	bin := erlang.term_to_binary(atom) or {
-		println(err.msg())
-		exit(0)
-	}
-	println(bin)
-	a := erlang.binary_to_term(bin) or {
-		println(err.msg())
-		exit(0)
-	}
-	println(a)
+pub fn main() {
+	// bin := old_float_to_binary(f64(1.6))
+
+	// bin := erlang.term_to_binary(atom) or {
+	// 	println(err.msg())
+	// 	exit(0)
+	// }
+	// println(bin)
+	// a := erlang.binary_to_term(bin) or {
+	//  	println(err.msg())
+	//  	exit(0)
+	//  }
+	//  println(a)
 }

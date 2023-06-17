@@ -39,6 +39,7 @@ pub fn (_be LittleEndian) put_u32(v u32) []u8 {
 	b << u8(v >> 24)
 	return b
 }
+
 pub fn (_be LittleEndian) put_u64(v u64) []u8 {
 	mut b := []u8{}
 	b << u8(v)
@@ -58,6 +59,7 @@ pub fn (_be LittleEndian) put_u16(v u16) []u8 {
 	b << u8(v >> 8)
 	return b
 }
+
 pub fn (_be LittleEndian) put_u8(v u8) []u8 {
 	mut b := []u8{}
 	b << u8(v)
@@ -74,7 +76,7 @@ pub fn (_be BigEndian) u32(b []u8) u32 {
 	return u32(b[3]) | u32(b[2]) << 8 | u32(b[1]) << 16 | u32(b[0]) << 24
 }
 
-pub  fn (_be BigEndian) u64(b []u8) u64 {
+pub fn (_be BigEndian) u64(b []u8) u64 {
 	return u64(b[7]) | u64(b[6]) << 8 | u64(b[5]) << 16 | u64(b[4]) << 24 | u64(b[3]) << 32 | u64(b[2]) << 40 | u64(b[1]) << 48 | u64(b[0]) << 56
 }
 
