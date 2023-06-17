@@ -27,7 +27,7 @@ The library is core of Lx lang to compiles code to BeamVM, futhermore will be po
 - ErlString
 - ErlTuple
 
-## The utils functions
+## The main functions
  - binary_to_term( []u8 ) Term
  - term_to_binary( Term ) []u8
  - int_to_term( int ) Term
